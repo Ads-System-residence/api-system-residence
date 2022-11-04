@@ -2,10 +2,6 @@ package com.system.residence.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsuarioDenormalized {

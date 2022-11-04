@@ -2,10 +2,9 @@ package com.system.residence.service.Login;
 
 import com.system.residence.datasource.domain.Usuario;
 import com.system.residence.repository.UsuarioRepository;
-import com.system.residence.response.Erros;
-import com.system.residence.response.Login;
-import com.system.residence.response.RecuperarPergunta;
-import com.system.residence.response.Response;
+import com.system.residence.request.RedefinirSenha;
+import com.system.residence.request.ValidPerguntaRespostaUsuario;
+import com.system.residence.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +13,13 @@ import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class LoginService {
+    @Autowired
+    private UsuarioRepository _usuarioRepository;
+
     @Autowired
     private EntityManager entityManager;
     private String inicioQuery;
@@ -118,6 +121,33 @@ public class LoginService {
         } else {
             Erros erros = new Erros();
             erros.setErro("Usuário não localizado!");
+            return new Response<>(erros, true);
+        }
+    }
+
+    public Response validarPerguntaSeguranca(ValidPerguntaRespostaUsuario validPerguntaRespostaUsuario) throws Exception {
+        Usuario usuario = obterUsuarioPorCpfString(validPerguntaRespostaUsuario.getCpf());
+        if (Objects.equals(usuario.getResp_seg(), validPerguntaRespostaUsuario.getRespostaSeguranca())) {
+            Success success = new Success();
+            success.setSuccess("Resposta válida!");
+            return new Response<>(success,true);
+        } else {
+            Erros erros = new Erros();
+            erros.setErro("Resposta inválida!");
+            return new Response<>(erros, true);
+        }
+    }
+
+    public Response redefinirSenha(RedefinirSenha redefinirSenha) throws Exception {
+        Optional<Usuario> oldUsuario = _usuarioRepository.getUsuarioByCpf(redefinirSenha.getCpf());
+        if (oldUsuario.isPresent()) {
+            Usuario usuario = oldUsuario.get();
+            usuario.setUser_password(redefinirSenha.getNovaSenha());
+            _usuarioRepository.save(usuario);
+            return new Response<>(usuario, true);
+        } else {
+            Erros erros = new Erros();
+            erros.setErro("Usuário inválido");
             return new Response<>(erros, true);
         }
     }

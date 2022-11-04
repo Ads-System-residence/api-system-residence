@@ -67,8 +67,7 @@ public class UsuarioController {
         Optional<Usuario> oldUsuario = _usuarioRepository.findById(id);
         if(oldUsuario.isPresent()){
             Usuario usuario = oldUsuario.get();
-            usuario.setName(newUsuario.getName());
-            usuario.setCpf(newUsuario.getCpf());
+            usuario.setUser_password(newUsuario.getUser_password());
             _usuarioRepository.save(usuario);
             return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
         }
